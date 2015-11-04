@@ -1,14 +1,16 @@
+require 'pry'
 class Game
   def initialize
     @board = ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
-    @com = "X"
-    @hum = "O"
+    @turns = ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
+    @computer = "X"
+    @human = "O"
   end
 
   def start_game
     puts "Welcome to my Tic Tac Toe game"
     puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
-    puts "Please select your spot."
+    puts "You go first, please select your space."
     until game_is_over(@board) || tie(@board)
       get_human_spot
       if !game_is_over(@board) && !tie(@board)
@@ -18,33 +20,48 @@ class Game
     end
     puts "Game over"
   end
-
   def get_human_spot
     spot = nil
+    open_spaces = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     until spot
-      spot = gets.chomp.to_i
-      if @board[spot] != "X" && @board[spot] != "O"
-        @board[spot] = @hum
+      spot = gets.chomp
+      number = spot.to_i
+      if @turns.include?(spot)
+        @turns.delete(spot)
+        @board[number] = @human
+        open_spaces.delete(number)
+        return spot = nil
       else
-        spot = nil
+        puts "Please enter a valid open space on the board!"
+        get_human_spot
       end
     end
   end
 
   def eval_board
     spot = nil
+    my_move = spot
     until spot
-      if @board[4] == "4"
-        spot = 4
-        @board[spot] = @com
-      else
-        spot = get_best_move(@board, @com)
+      if @board[4] == @human && @board[0] = @computer
+        spot = get_best_move(@board, @computer)
+        my_move = spot
         if @board[spot] != "X" && @board[spot] != "O"
-          @board[spot] = @com
+          @board[spot] = @computer
         else
           spot = nil
         end
-      end
+      elsif @board[4] == @human
+        spot = 0
+        my_move = spot
+        @board[spot] = @computer
+        spot = nil 
+      elsif @board[4] == "4"
+        spot = 4
+        my_move = spot
+        @board[spot] = @computer 
+      end      
+      # my_move
+      puts "My move was to space #{my_move}. Your turn!"
     end
   end
 
@@ -57,13 +74,13 @@ class Game
       end
     end
     available_spaces.each do |as|
-      board[as.to_i] = @com
+      board[as.to_i] = @computer
       if game_is_over(board)
         best_move = as.to_i
         board[as.to_i] = as
         return best_move
       else
-        board[as.to_i] = @hum
+        board[as.to_i] = @human
         if game_is_over(board)
           best_move = as.to_i
           board[as.to_i] = as
