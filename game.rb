@@ -9,14 +9,33 @@ class Game
 
   def start_game
     puts "Welcome to my Tic Tac Toe game"
+    coin_toss
     puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
-    puts "You go first, please select your space."
     until game_is_over(@board) || tie(@board)
       get_human_spot
       eval_board
       puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
     end
     puts "Game over"
+  end
+
+  def coin_toss
+    heads = 1
+    tails = 2
+    puts "heads or tails?"
+    call = gets.chomp
+    call.downcase
+    if call != "heads" || call != "tails"
+      puts "Invalid answer, heads or tails?"
+    end
+    coin = rand(1..2)
+
+    if call == coin
+      puts "You won the toss. Please select your space."
+    else
+      puts "I won the toss, get ready to loose...Dave" 
+      eval_board
+    end
   end
   def get_human_spot
     spot = nil
@@ -46,18 +65,31 @@ class Game
           my_move = spot
           @board[spot] = @computer
         end
+      elsif @board[4] == "X" && @board[0] == "X"
+        if @board[8] == "8"
+          spot = 8
+          my_move = spot
+          @board[spot] = @computer
+          puts "I win!"
+        elsif @board[8] == "O"
+          spot = checkmate(@board)
+          @board[spot] = @computer
+          puts "That's checkmate bruh!"
+        end
+      elsif @board[4] == "X"
+        if second_move(@board)
+          spot = second_move(@board)
+          my_move = spot
+          @board[spot] = @computer
+        else
+          spot = 0
+          my_move = spot
+          @board[spot] = "X"
+        end        
       elsif @board[4] == "4"
         spot = 4
         my_move = spot
         @board[spot] = @computer 
-        # puts "My move was to space #{my_move}. Your turn!"
-        # spot = nil
-      elsif @board[0] == "0"
-        spot = 0
-        my_move = spot
-        @board[spot] = @computer 
-        # puts "My move was to space #{my_move}. Your turn!" 
-        # spot = nil
       else
         spot = nil
       end 
@@ -66,53 +98,82 @@ class Game
     end
   end
 
-  def get_best_move(board, next_player, depth = 0, best_score = {})
-    available_spaces = []
+  def second_move(board)
+    column_3 = [board[2], board[5], board[8]]
+    row_3 = [board[6], board[7], board[8]]
+    row_2 = [board[0], board[1], board[2]]
+    # best_move = nil
+
+    if column_3.count("O") == 2 || row_3.count("O") == 2
+      return get_best_move(@board, @computer)
+    end
+  end
+
+  def checkmate(board)
+    column_1 = [board[0], board[3], board[6]]
+    column_2 = [board[1], board[4], board[7]]
+    row_1 = [board[0], board[1], board[2]]
+    row_2 = [board[0], board[1], board[2]]
+    diagonal_1 = [board[2], board[4], board[6]]
     best_move = nil
-    board.each do |s|
-      if s != "X" && s != "O"
-        available_spaces << s
+
+    if column_1.include?("1") && column_1.include?("2") && row_2.include?("3") && row_2.include?("5")
+      best_move = board[3].to_i
+    elsif column_1.include?("1") && column_1.include?("2") && diagonal_1.include?("2") && row_2.include?("6")
+      best_move = board[6]
+    end
+    if best_move
+      return best_move
+    end
+  end
+
+  def get_best_move(board, next_player, depth = 0, best_score = {})
+    open_spaces = []
+    best_move = nil
+    board.each do |space|
+      if space != "X" && space != "O"
+        open_spaces << space
       end
     end
-    available_spaces.each do |as|
-      board[as.to_i] = @computer
+    open_spaces.each do |open_space|
+      board[open_space.to_i] = @computer
       if game_is_over(board)
-        best_move = as.to_i
-        board[as.to_i] = as
+        best_move = open_space.to_i
+        board[open_space.to_i] = open_space
         return best_move
       else
-        board[as.to_i] = @human
+        board[open_space.to_i] = @human
         if game_is_over(board)
-          best_move = as.to_i
-          board[as.to_i] = as
+          best_move = open_space.to_i
+          board[open_space.to_i] = open_space
           return best_move
         else
-          board[as.to_i] = as
+          board[open_space.to_i] = open_space
         end
       end
     end
     if best_move
       return best_move
     else
-      n = rand(0..available_spaces.count)
-      return available_spaces[n].to_i
+      n = rand(0..open_spaces.count)
+      return open_spaces[n].to_i
     end
   end
 
-  def game_is_over(b)
+  def game_is_over(board)
 
-    [b[0], b[1], b[2]].uniq.length == 1 ||
-    [b[3], b[4], b[5]].uniq.length == 1 ||
-    [b[6], b[7], b[8]].uniq.length == 1 ||
-    [b[0], b[3], b[6]].uniq.length == 1 ||
-    [b[1], b[4], b[7]].uniq.length == 1 ||
-    [b[2], b[5], b[8]].uniq.length == 1 ||
-    [b[0], b[4], b[8]].uniq.length == 1 ||
-    [b[2], b[4], b[6]].uniq.length == 1
+    [board[0], board[1], board[2]].uniq.length == 1 ||
+    [board[3], board[4], board[5]].uniq.length == 1 ||
+    [board[6], board[7], board[8]].uniq.length == 1 ||
+    [board[0], board[3], board[6]].uniq.length == 1 ||
+    [board[1], board[4], board[7]].uniq.length == 1 ||
+    [board[2], board[5], board[8]].uniq.length == 1 ||
+    [board[0], board[4], board[8]].uniq.length == 1 ||
+    [board[2], board[4], board[6]].uniq.length == 1
   end
 
-  def tie(b)
-    b.all? { |s| s == "X" || s == "O" }
+  def tie(board)
+    board.all? { |space| space == "X" || space == "O" }
   end
 
 end
