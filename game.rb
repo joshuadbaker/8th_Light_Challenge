@@ -13,9 +13,7 @@ class Game
     puts "You go first, please select your space."
     until game_is_over(@board) || tie(@board)
       get_human_spot
-      if !game_is_over(@board) && !tie(@board)
-        eval_board
-      end
+      eval_board
       puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
     end
     puts "Game over"
@@ -42,26 +40,29 @@ class Game
     spot = nil
     my_move = spot
     until spot
-      if @board[4] == @human && @board[0] = @computer
+      if @board[4] == "X" && @board[0] == "O" || @board[4] == "O" && @board[0] == "X" || @board[4] == "X" && @board[0] == "X"
         spot = get_best_move(@board, @computer)
-        my_move = spot
         if @board[spot] != "X" && @board[spot] != "O"
+          my_move = spot
           @board[spot] = @computer
-        else
-          spot = nil
         end
-      elsif @board[4] == @human
-        spot = 0
-        my_move = spot
-        @board[spot] = @computer
-        spot = nil 
       elsif @board[4] == "4"
         spot = 4
         my_move = spot
         @board[spot] = @computer 
-      end      
-      # my_move
-      puts "My move was to space #{my_move}. Your turn!"
+        # puts "My move was to space #{my_move}. Your turn!"
+        # spot = nil
+      elsif @board[0] == "0"
+        spot = 0
+        my_move = spot
+        @board[spot] = @computer 
+        # puts "My move was to space #{my_move}. Your turn!" 
+        # spot = nil
+      else
+        spot = nil
+      end 
+      # binding.pry
+      puts "My move was to space #{my_move}. Your turn!"    
     end
   end
 
