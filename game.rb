@@ -1,5 +1,6 @@
 require 'pry'
 class Game
+  # attr_accessor :player_1, :player_2
   def initialize
     @board = ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
     @turns = ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
@@ -8,7 +9,12 @@ class Game
   end
 
   def start_game
+    puts "Hello..."
+    sleep(2)
+    puts "...Dave"
+    sleep(1)
     puts "Welcome to my Tic Tac Toe game"
+    sleep(1)
     coin_toss
     puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
     until game_is_over(@board) || tie(@board)
@@ -20,22 +26,34 @@ class Game
   end
 
   def coin_toss
-    heads = 1
-    tails = 2
     puts "heads or tails?"
     call = gets.chomp
     call.downcase
-    if call != "heads" || call != "tails"
-      puts "Invalid answer, heads or tails?"
-    end
-    coin = rand(1..2)
-
-    if call == coin
-      puts "You won the toss. Please select your space."
+    if call == "heads"
+      coin = rand(1..2)
+      call = 1
+      if call == coin
+        puts "You won the toss. Please select your space."
+      else
+        puts "I won the toss, get ready to loose...Dave" 
+        eval_board
+      end
+    elsif call == "tails"
+      coin = rand(1..2)
+      call = 2
+      if call == coin
+         puts "You won the toss. Please select your space."
+      else
+        puts "I won the toss, get ready to loose...Dave" 
+        eval_board
+      end
     else
-      puts "I won the toss, get ready to loose...Dave" 
-      eval_board
+      puts "Invalid answer, heads or tails?"
+      coin_toss
     end
+    
+
+    
   end
   def get_human_spot
     spot = nil
@@ -70,7 +88,7 @@ class Game
           spot = 8
           my_move = spot
           @board[spot] = @computer
-          puts "I win!"
+          # puts "I win!"
         elsif @board[8] == "O"
           spot = checkmate(@board)
           @board[spot] = @computer
@@ -98,6 +116,22 @@ class Game
     end
   end
 
+  def computer_went_first(board)
+    eight = [2, 6]
+    two = [0, 8]
+    zero = [2, 8]
+    if board[4] == "X" && board.count("X") == 1 && board.count("O") == 1
+      if board[8] == "O"
+        return eight.sample
+      elsif board[2] == "O"
+        return two.sample
+      elsif board[0] == "O"
+        return zero.sample
+      end
+    else
+
+    end
+  end
   def second_move(board)
     column_3 = [board[2], board[5], board[8]]
     row_3 = [board[6], board[7], board[8]]
