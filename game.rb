@@ -9,33 +9,13 @@ class Game
     @player_2 = player_2
   end
 
-  def start_game
+  def create_new_game
     puts "Hello..."
     # sleep(2)
     puts "...Dave"
     # sleep(1)
     puts "Welcome to Tic Tac Toe!"
-    # sleep(1)
-    create_new_game
-    if game_version == 1    
-      coin_toss
-    elsif game_version == 2
-      coin_toss
-    elsif game_version == 3
-      coin_toss
-    else
-      create_new_game
-    end 
-    puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
-    until game_is_over(@board) || tie(@board)
-      get_human_spot
-      eval_board
-      puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
-    end
-    puts "Game over"
-  end
-
-  def create_new_game  
+    # sleep(1)  
     puts "Select from the following options and only type the first letter not the whole word\n(s)tart game\n(q)uit Tic Tac Toe"
     response = gets.chomp
     response = response.downcase
@@ -47,6 +27,7 @@ class Game
           game_version = game_version.to_i
           if game_version == 1
             puts "You chose person vs person!"
+            person_vs_person
           elsif game_version == 2
             puts "person vs Hal"
           elsif game_version == 3
@@ -55,13 +36,14 @@ class Game
             abort("Thank you for playing!")
           end    
         end
-        game_version
+        coin_toss
+        start_game 
       end
     else 
       puts "Please enter a valid command with the first letter."
       sleep(1)
       create_new_game
-    end 
+    end
   end
 
   def person_vs_person
@@ -107,9 +89,20 @@ class Game
         # eval_board
       end
     else
-      puts "Invalid answer, heads or tails?"
+      puts "Invalid answer"
       coin_toss
-    end   
+    end
+       
+  end
+
+  def start_game
+    puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
+    until game_is_over(@board) || tie(@board)
+      get_human_spot
+      eval_board
+      puts "|_#{@board[0]}_|_#{@board[1]}_|_#{@board[2]}_|\n|_#{@board[3]}_|_#{@board[4]}_|_#{@board[5]}_|\n|_#{@board[6]}_|_#{@board[7]}_|_#{@board[8]}_|\n"
+    end
+    puts "Game over"
   end
   # def get_human_spot
   #   spot = nil
@@ -269,4 +262,4 @@ class Game
 end
 
 game = Game.new
-game.start_game
+game.create_new_game
