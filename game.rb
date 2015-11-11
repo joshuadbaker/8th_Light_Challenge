@@ -12,18 +12,16 @@ require './human.rb'
 require './computer.rb'
 require './gameboard.rb'
 class Game
-  attr_accessor :player_1, :player_2, :new_gameboard
+  attr_accessor :player_1, :player_2, :new_gameboard, :turn_order
   def initialize()
     @player_1 = player_1
     @player_2 = player_2
     @new_gameboard = new_gameboard
+    @turn_order = []
   end
 
   def create_new_game
-    @new_gameboard = Gameboard.new()
-    # select(game_version)
-    # coin_toss
-    
+    @new_gameboard = Gameboard.new()  
   end
 
   def select(selection_number)
@@ -43,29 +41,19 @@ class Game
   def coin_toss
     if @player_1.go_first == true
       @player_1.go_first = true
+      @turn_order.push(@player_1)
+      @turn_order.push(@player_2)
+      # binding.pry
     else
       @player_2.go_first = true
+      @turn_order.push(@player_2)
+      @turn_order.push(@player_1)
+      # binding.pry
     end  
   end
 
-  def take_turn(board, turns, player)
-    spot = nil
-    # open_spaces = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    until spot
-      spot = gets.chomp
-      number = spot.to_i
-      if turns.include?(spot)
-        turns.delete(spot)
-        board[number] = player.id 
-        # open_spaces.delete(number)
-        # binding.pry    
-        take_turn(player)
-        spot = nil
-      else
-        puts "Please enter a valid open space on the board!"
-        take_turn(board, turns, player_1, player_2)
-      end
-    end
+  def take_turn(player, board, number)
+    board[number] = player.game_symbol  
   end
 end
 
