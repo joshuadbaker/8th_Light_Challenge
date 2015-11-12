@@ -1,3 +1,4 @@
+require 'pry'
 require './computer.rb'
 require './human.rb'
 class Gameboard
@@ -17,6 +18,7 @@ class Gameboard
     [board[2], board[5], board[8]].uniq.length == 1 ||
     [board[0], board[4], board[8]].uniq.length == 1 ||
     [board[2], board[4], board[6]].uniq.length == 1 ||
+
     board.all? { |space| space == player_1_game_symbol || space == player_2_game_symbol}
   end
 end

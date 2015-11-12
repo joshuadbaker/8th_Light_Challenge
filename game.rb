@@ -36,7 +36,6 @@ class Game
     elsif selection_number == 2
       @player_1 = Human.new("X")
       @player_array.push(@player_1)
-      computer_name = ["Hal", "Skynet"]
       @player_2 = Computer.new(computer_name.sample, "O")
       @player_array.push(@player_2)
     else

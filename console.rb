@@ -31,7 +31,7 @@ class Console
           puts "|_#{@new_game.new_gameboard.board[0]}_|_#{@new_game.new_gameboard.board[1]}_|_#{@new_game.new_gameboard.board[2]}_|\n|_#{@new_game.new_gameboard.board[3]}_|_#{@new_game.new_gameboard.board[4]}_|_#{@new_game.new_gameboard.board[5]}_|\n|_#{@new_game.new_gameboard.board[6]}_|_#{@new_game.new_gameboard.board[7]}_|_#{@new_game.new_gameboard.board[8]}_|\n" 
           
           # Player turns with until loop checking for winning move
-          until @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1, @new_game.player_2)
+          until @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
             @new_game.turn_order.each do |player|
               puts "Your turn, #{player.name}!"
               spot = gets.chomp
@@ -50,9 +50,15 @@ class Console
               puts "|_#{@new_game.new_gameboard.board[0]}_|_#{@new_game.new_gameboard.board[1]}_|_#{@new_game.new_gameboard.board[2]}_|\n|_#{@new_game.new_gameboard.board[3]}_|_#{@new_game.new_gameboard.board[4]}_|_#{@new_game.new_gameboard.board[5]}_|\n|_#{@new_game.new_gameboard.board[6]}_|_#{@new_game.new_gameboard.board[7]}_|_#{@new_game.new_gameboard.board[8]}_|\n"
               
               # checks for winning move
-              if @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1, @new_game.player_2)
-                puts "#{player.name} wins!"
-                return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1, @new_game.player_2)
+              if @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                # trying to create condtion for win vs tie
+                if @new_game.new_gameboard.board.all? { |space| space == @new_game.player_1.game_symbol || space == @new_game.player_2.game_symbol}
+                  puts "It's a tie!"
+                  return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                else 
+                  puts "#{player.name} wins!"
+                  return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                end
               else
                 puts "#{player.name} moved to space #{number}."
               end
@@ -75,11 +81,11 @@ class Console
         puts "You chose person vs person!"
         game_version
       elsif game_version == 2
-        puts "You chose person vs computer, good luck against Hal!"
-        @new_game.select(game_version)
+        puts "You chose person vs computer, good luck!"
+        game_version
       elsif game_version == 3
         puts "Hal vs Skynet"
-        @new_game.select(game_version) 
+        game_version
       end
     else
       puts "Invalid entry, please enter 1, 2, or 3"
@@ -89,15 +95,44 @@ class Console
 
   def create_players
     new_game.player_array.each do |player|
-      puts "Please enter the name for #{player}."
-      name = gets.chomp
-      player.name = name
-      puts "Please enter a single character as your game symbol(The game will default to #{player.game_symbol})"
-      symbol = gets.chomp
-      if symbol == ""
-        player.game_symbol = player.game_symbol
+      original_symbol = player.game_symbol
+      if player.name == "Hal" || player.name == "Skynet"
+        if player.symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "X"
+          player.symbol = "O"
+        elsif player.symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "O"
+          player.symbol = "X"
+        end
+        puts "I am #{player.name} and my game symbol is #{player.game_symbol}.  Good luck!"
+      else
+        puts "Please enter the name for #{player}."
+        name = gets.chomp
+        player.name = name
+        puts "Please enter a single character as your game symbol(The game will default to #{player.game_symbol})"
+        symbol = gets.chomp.upcase
+        if player == @new_game.player_2
+          while symbol == @new_game.player_1.game_symbol
+            puts "Please enter a different symbol from #{@new_game.player_1}."
+            symbol = gets.chomp.upcase
+          end
+          if symbol == "" && original_symbol == @new_game.player_1.game_symbol
+            while symbol == "" 
+              puts "Please enter a different symbol from #{@new_game.player_1}."
+              symbol = gets.chomp.upcase
+            end
+            player.game_symbol = symbol
+          elsif symbol == ""
+            player.game_symbol = original_symbol
+          else
+            player.game_symbol = symbol
+          end
+          # binding.pry
+        elsif symbol == ""
+          player.game_symbol = original_symbol
+        else
+          player.game_symbol = symbol
+        end
+        puts "Your name is #{player.name} and your game symbol is #{player.game_symbol}."
       end
-      puts "Your name is #{player.name} and your game symbol is #{player.game_symbol}."
     end
   end
 
