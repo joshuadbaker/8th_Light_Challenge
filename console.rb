@@ -25,8 +25,7 @@ class Console
         until response == "q"
           selection_number = select_version
           @new_game.select(selection_number)
-          create_player(@new_game.player_1)
-          create_player(@new_game.player_2)
+          create_players
           coin_toss
           @new_game.create_new_game
           puts "|_#{@new_game.new_gameboard.board[0]}_|_#{@new_game.new_gameboard.board[1]}_|_#{@new_game.new_gameboard.board[2]}_|\n|_#{@new_game.new_gameboard.board[3]}_|_#{@new_game.new_gameboard.board[4]}_|_#{@new_game.new_gameboard.board[5]}_|\n|_#{@new_game.new_gameboard.board[6]}_|_#{@new_game.new_gameboard.board[7]}_|_#{@new_game.new_gameboard.board[8]}_|\n" 
@@ -88,14 +87,19 @@ class Console
     end  
   end
 
-  def create_player(player)
-    puts "Please enter the name for #{player}."
-    name = gets.chomp
-    player.name = name
-    puts 'Please enter a single character as your game symbol(The game will default to "X")'
-    symbol = gets.chomp
-    player.game_symbol = symbol
-    puts "Your name is #{player.name} and your game symbol is #{player.game_symbol}."
+  def create_players
+    binding.pry
+    new_game.player_array.each do |player|
+      puts "Please enter the name for #{player}."
+      name = gets.chomp
+      player.name = name
+      puts "Please enter a single character as your game symbol(The game will default to #{player.game_symbol})"
+      symbol = gets.chomp
+      if symbol == ""
+        player.game_symbol = player.game_symbol
+      end
+      puts "Your name is #{player.name} and your game symbol is #{player.game_symbol}."
+    end
   end
 
   def coin_toss
