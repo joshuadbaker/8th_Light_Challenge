@@ -88,7 +88,6 @@ class Console
   end
 
   def create_players
-    binding.pry
     new_game.player_array.each do |player|
       puts "Please enter the name for #{player}."
       name = gets.chomp
