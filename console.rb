@@ -84,7 +84,7 @@ class Console
         puts "You chose person vs computer, good luck!"
         game_version
       elsif game_version == 3
-        puts "Hal vs Skynet"
+        puts "You chose computer vs. computer, enjoy the match!"
         game_version
       end
     else
@@ -96,11 +96,11 @@ class Console
   def create_players
     new_game.player_array.each do |player|
       original_symbol = player.game_symbol
-      if player.name == "Hal" || player.name == "Skynet"
-        if player.symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "X"
-          player.symbol = "O"
-        elsif player.symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "O"
-          player.symbol = "X"
+      if player.is_a?(Computer)
+        if player.game_symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "X"
+          player.game_symbol = "O"
+        elsif player.game_symbol == @new_game.player_1.game_symbol &&  @new_game.player_1.game_symbol == "O"
+          player.game_symbol = "X"
         end
         puts "I am #{player.name} and my game symbol is #{player.game_symbol}.  Good luck!"
       else
@@ -138,8 +138,14 @@ class Console
 
   def coin_toss
     puts "#{@new_game.player_1.name}, heads or tails?"
-    call = gets.chomp
-    call.downcase
+    if @new_game.player_1.is_a?(Computer)
+      call = "heads"
+      puts "#{@new_game.player_1.name} selects heads."
+    else
+      call = gets.chomp
+      call.downcase
+      # binding.pry
+    end
     if call == "heads"
       coin = rand(1..2)
       call = 1
