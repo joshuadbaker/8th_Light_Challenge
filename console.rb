@@ -57,15 +57,13 @@ class Console
               else
                 puts "#{player.name} moved to space #{number}."
               end
-
             end #turn_order each loop
           end # until loop for turn_order array
         end # until "q" loop
       end # if "s" condition    
     else 
       puts "Please enter a valid command with the first letter."
-      sleep(1)
-      @new_game.create_new_game
+      display_new_game
     end
   end
 
@@ -73,18 +71,21 @@ class Console
     puts "Select number for version of game:\n 1. Person vs. Person\n 2. Person vs. Computer\n 3. Computer vs. Computer"
     game_version = gets.chomp
     game_version = game_version.to_i
-    if game_version == 1
-      puts "You chose person vs person!"
-      game_version
-    elsif game_version == 2
-      puts "You chose person vs computer, good luck against Hal!"
-      @new_game.select(game_version)
-    elsif game_version == 3
-      puts "Hal vs Skynet"
-      @new_game.select(game_version)
-    else 
-      abort("Thank you for playing!")
-    end
+    if game_version == 1 || game_version == 2 || game_version == 3
+      if game_version == 1
+        puts "You chose person vs person!"
+        game_version
+      elsif game_version == 2
+        puts "You chose person vs computer, good luck against Hal!"
+        @new_game.select(game_version)
+      elsif game_version == 3
+        puts "Hal vs Skynet"
+        @new_game.select(game_version) 
+      end
+    else
+      puts "Invalid entry, please enter 1, 2, or 3"
+      select_version
+    end  
   end
 
   def create_player(player)

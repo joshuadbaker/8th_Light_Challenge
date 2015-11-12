@@ -25,17 +25,20 @@ class Game
   end
 
   def select(selection_number)
-    # binding.pry
+    player_array = []
+    computer_name = ["Hal", "Skynet"]
     if selection_number == 1
-     @player_1 = Human.new()
-     @player_2 = Human.new()
+     @player_1 = Human.new("X")
+     @player_2 = Human.new("O")
     elsif selection_number == 2
-      @player_1 = Human.new()
-      @player_2 = Computer.new()
+      @player_1 = Human.new("X")
+      computer_name = ["Hal", "Skynet"]
+      @player_2 = Computer.new(computer_name.sample, "O")
     else
-      @player_1 = Computer.new()
-      @player_2 = Computer.new()
+      @player_1 = Computer.new(computer_name[0], "X")
+      @player_2 = Computer.new(computer_name[1], "O")
     end
+    player_array = [@player_1, @player_2]
   end
 
   def coin_toss
