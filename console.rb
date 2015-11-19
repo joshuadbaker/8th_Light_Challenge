@@ -1,6 +1,7 @@
 require('pry')
 require('./game.rb')
 require('./gameboard.rb')
+
 class Console
   attr_accessor :view, :new_game
   def initialize()
@@ -23,55 +24,82 @@ class Console
     if response == "s" || response == "q"
       if response == "s"
         until response == "q"
+
+          # selects version of game and creates that version as new instance
           selection_number = select_version
           @new_game.select(selection_number)
+          # selection designates whether to make human or computer players 
           create_players
+
+          # coin_toss selects who go first 
           coin_toss
+
+          # Creates a new game
           @new_game.create_new_game
           puts "|_#{@new_game.new_gameboard.board[0]}_|_#{@new_game.new_gameboard.board[1]}_|_#{@new_game.new_gameboard.board[2]}_|\n|_#{@new_game.new_gameboard.board[3]}_|_#{@new_game.new_gameboard.board[4]}_|_#{@new_game.new_gameboard.board[5]}_|\n|_#{@new_game.new_gameboard.board[6]}_|_#{@new_game.new_gameboard.board[7]}_|_#{@new_game.new_gameboard.board[8]}_|\n" 
           
-          # Player turns with until loop checking for winning move
+          # Player turns inside of until loop checking for move that ends game
           until @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
-            @new_game.turn_order.each do |player|
-              puts "Your turn, #{player.name}!"
-              spot = gets.chomp
-              number = spot.to_i
 
-              # checks for invalid entry on gameboard
-              while @new_game.new_gameboard.turns.include?(spot) == false
-                puts "Please enter a valid open space on the board, #{player.name}."
-                spot = gets.chomp
-                number = spot.to_i
+            # turn_order array keeps track of players after the coin_toss method is called
+            @new_game.turn_order.each do |player|
+              # conditional statement designates who is player and who is oppoent in each turn for the get_best_move method
+              @new_game.player = player
+              if player == @new_game.player_1
+                @new_game.opponent = @new_game.player_2
+              else
+                @new_game.opponent = @new_game.player_1
               end
 
+              # message to notify player it's his/her turn
+              puts "Your turn, #{player.name}!"
+              
+              # Checks to see if player is a computer
+              if player.is_a?(Computer)
+                @new_game.get_best_move(@new_game.new_gameboard.board, 0, player, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                spot = @new_game.computer_move
+                number = spot.to_i
+              else
+              
+              # Human player
+                spot = gets.chomp
+                number = spot.to_i
+                while @new_game.new_gameboard.turns.include?(spot) == false
+                  puts "Please enter a valid open space on the board, #{player.name}."
+                  spot = gets.chomp
+                  number = spot.to_i
+                end
+              end
               # player move
+              puts "#{player.name} moves to #{spot}."
               @new_game.new_gameboard.turns.delete(spot)
-              @new_game.take_turn(player, @new_game.new_gameboard.board, number)       
+              @new_game.take_turn(@new_game.new_gameboard.board, player, number)
+              @new_game.new_gameboard.board[number] = player.game_symbol     
               puts "|_#{@new_game.new_gameboard.board[0]}_|_#{@new_game.new_gameboard.board[1]}_|_#{@new_game.new_gameboard.board[2]}_|\n|_#{@new_game.new_gameboard.board[3]}_|_#{@new_game.new_gameboard.board[4]}_|_#{@new_game.new_gameboard.board[5]}_|\n|_#{@new_game.new_gameboard.board[6]}_|_#{@new_game.new_gameboard.board[7]}_|_#{@new_game.new_gameboard.board[8]}_|\n"
               
-              # checks for winning move
-              if @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
-                # trying to create condtion for win vs tie
-                if @new_game.new_gameboard.board.all? { |space| space == @new_game.player_1.game_symbol || space == @new_game.player_2.game_symbol}
-                  puts "It's a tie!"
-                  return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
-                else 
-                  puts "#{player.name} wins!"
-                  return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
-                end
+              # checks for winning move, tie, or moves to next turn
+              if @new_game.new_gameboard.tie(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                puts "It's a tie!"
+                return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+              elsif @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
+                puts "#{player.name} wins!"
+                return @new_game.new_gameboard.game_is_over(@new_game.new_gameboard.board, @new_game.player_1.game_symbol, @new_game.player_2.game_symbol)
               else
+                # Notifies next player of where current player moved
                 puts "#{player.name} moved to space #{number}."
               end
             end #turn_order each loop
           end # until loop for turn_order array
         end # until "q" loop
       end # if "s" condition    
-    else 
+    else
+      # redirects user to correct entry in CLI 
       puts "Please enter a valid command with the first letter."
       display_new_game
     end
   end
 
+  # Selects version of game in CLI
   def select_version
     puts "Select number for version of game:\n 1. Person vs. Person\n 2. Person vs. Computer\n 3. Computer vs. Computer"
     game_version = gets.chomp
@@ -93,6 +121,7 @@ class Console
     end  
   end
 
+  # Creates the players in the CLI
   def create_players
     new_game.player_array.each do |player|
       original_symbol = player.game_symbol
@@ -136,11 +165,12 @@ class Console
     end
   end
 
+  # Coin toss to establish who goes first in CLI
   def coin_toss
     puts "#{@new_game.player_1.name}, heads or tails?"
     if @new_game.player_1.is_a?(Computer)
-      call = "heads"
-      puts "#{@new_game.player_1.name} selects heads."
+      call = ["heads", "tails"].sample
+      puts "#{@new_game.player_1.name} selects #{call}."
     else
       call = gets.chomp
       call.downcase
@@ -174,19 +204,6 @@ class Console
     end
     @new_game.coin_toss
   end
-
-  def start_game(board, player_1, player_2)
-  end
-  # def play_again
-  #   puts "Play again? (Y)es or (N)o"
-  #   answer = gets.chomp
-  #   answer.downcase
-  #   if answer == 'y'
-  #     display_new_game
-  #   else
-  #     abort("Thanks for playing!")
-  #   end
-  # end
 end
 
 console = Console.new
