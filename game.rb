@@ -21,7 +21,6 @@ class Game
     @new_gameboard = Gameboard.new()  
   end
 
-  # "model" side of logic for selection of game
   def select(selection_number)
     player_array = []
     computer_name = ["Hal", "Skynet"]
@@ -42,8 +41,7 @@ class Game
       @player_array.push(@player_2)
     end  
   end
-
-  # "model" side of logic for coin toss  
+  
   def coin_toss
     if @player_1.go_first == true
       @player_1.go_first = true
@@ -56,19 +54,16 @@ class Game
     end  
   end
 
-  # selects spot on board and attaches it to the player
   def take_turn(board, player, number)
     board[number] = player.game_symbol
   end
 
-  # Check for a winning play for the minimax method
   def wins(player, board, player_1_game_symbol, player_2_game_symbol)
     if player && @new_gameboard.game_is_over(board, player_1_game_symbol, player_2_game_symbol)
       return true
     end
   end
 
-  # Assesses a move and attaches a value to it based on its condition for the minimax method
   def move_assessment(depth, player, board, player_1_game_symbol, player_2_game_symbol)
     if wins(@player, board, player_1_game_symbol, player_2_game_symbol)
       return 10 - depth
@@ -78,41 +73,26 @@ class Game
       return 0
     end
   end
-
+  
   # minimax method to check for best move for a computer move
   def get_best_move(board, depth, player, player_1_game_symbol, player_2_game_symbol)
-    # Checks for a value of a move
     if new_gameboard.game_is_over(board, @player_1_game_symbol, @player_2_game_symbol)
       return move_assessment(depth, player, board, player_1_game_symbol, player_2_game_symbol) 
     end
-
-    # depth keeps numerical value of the moves until the game ends
     depth += 1
-
-    # stores the scores from the move_assessment method
     scores = []
-
-    # stores the possible moves
     moves = []
-    
-    # potnetial_turns array keeps track of turns inside of the minimax method
+    # potential_turns array keeps track of turns inside of the minimax method
     @potential_turns.each do |move|
       # passes in potential_gameboard array to check for potential moves
       take_turn(potential_gameboard, player, move)
-
-      # store potential_gameboard in outcome variable
       outcome = potential_gameboard
-
-      # delete move from potential_turns array
       potential_turns.delete(move)
 
       # recursion of the get_best_move method occurs below and the result is pushed into the scores array
       scores.push(get_best_move(outcome, depth, player, player_1_game_symbol, player_2_game_symbol))
-
-      # Collects moves
       moves.push(move)
     end
-
     # Based on player during each state, assigns the scores to winning scores or scores to prevent loss
     # It is here that I ran into trouble with the moves array running out of moves and one turn from each player
     # Also inside of this method I encountered the issues with pry in terminal
